@@ -1,6 +1,6 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUserApi,registerUserApi } from "./authService";
+import { loginUserApi,registerUserApi,getmeApi } from "./authService";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -25,6 +25,20 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Registration failed"
+      );
+    }
+  }
+);
+
+export const checkAuth = createAsyncThunk(
+  "auth/getUser",
+  async (_, thunkAPI) => {
+    try {
+      return await getmeApi();
+
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch user details"
       );
     }
   }

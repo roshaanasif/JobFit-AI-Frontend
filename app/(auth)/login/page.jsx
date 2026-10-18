@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 import { loginUser } from "../../Redux/auth/authThunk";
+import GuestRoute  from "../../components/guestRoutes"
 
 export default function Login() {
+
+  
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const { loading, error } = useSelector(
     (state) => state.auth
@@ -35,6 +40,9 @@ export default function Login() {
       setSuccessMessage(
         result.message || "Signed in successfully."
       );
+
+      router.replace('/home')
+
     } catch (error) {
       console.log(error);
     }
@@ -42,6 +50,8 @@ export default function Login() {
 
 
   return (
+    
+      <GuestRoute>
     <div className="w-full h-full">
            <form className="space-y-4" onSubmit={handleSubmit}>
 
@@ -75,12 +85,12 @@ export default function Login() {
                       Password
                     </label>
 
-                    <button
+                    {/* <button
                       type="button"
                       className="text-sm font-medium text-[#1D4ED8] hover:text-[#1e40af]"
                     >
                       Forgot password?
-                    </button>
+                    </button> */}
                   </div>
 
                   <input
@@ -116,7 +126,7 @@ export default function Login() {
                 </button>
               </form>
     </div>
-
+</GuestRoute>
   )
 
 }

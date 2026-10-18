@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 import { registerUser } from "../../Redux/auth/authThunk";
 
@@ -9,6 +10,7 @@ import { registerUser } from "../../Redux/auth/authThunk";
 export default  function register() {
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const { loading, error } = useSelector(
     (state) => state.auth
@@ -41,6 +43,8 @@ export default  function register() {
           setSuccessMessage(
             result.message || "registration successfull."
           );
+
+          router.replace('/login')
         } catch (error) {
           console.log(error);
         }
