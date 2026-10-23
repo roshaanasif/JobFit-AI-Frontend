@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import {loginUser,registerUser,checkAuth} from "./authThunk";
+import {loginUser,registerUser,checkAuth,logoutUser} from "./authThunk";
 
 const initialState = {
   user: null,
   isAuthenticated: false,
+  accessToken:null,  
   initialized:false,
   initialLoading:false,
   initialError:false,
@@ -18,10 +19,14 @@ const authSlice = createSlice({
   initialState,
 
   reducers: {
+    setAccessToken: (state, action) => {
+    state.accessToken = action.payload;
+  },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.initialized = false;
+      state.accessToken = null;
       state.loading = false;
       state.error = null;
     },
@@ -42,7 +47,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-
+        state.accessToken = action.payload.token;
         state.user = action.payload.user;
         state.isAuthenticated = true;
       })
@@ -53,6 +58,7 @@ const authSlice = createSlice({
       })
 
     
+      
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -66,6 +72,21 @@ const authSlice = createSlice({
       })
 
       .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+        state.user = null;
+        state.accessToken = null;
+        state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -94,6 +115,7 @@ const authSlice = createSlice({
 export const {
   logout,
   clearError,
+  setAccessToken,
 } = authSlice.actions;
 
 export default authSlice.reducer;

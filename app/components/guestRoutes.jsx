@@ -15,7 +15,7 @@ export default function GuestRoute({ children }) {
 
   useEffect(() => {
     if (initialized && isAuthenticated) {
-      router.replace("/home");
+      router.replace("/dashboard");
     }
   }, [initialized, isAuthenticated, router]);
 
