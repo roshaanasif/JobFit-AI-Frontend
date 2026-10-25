@@ -28,8 +28,10 @@ api.interceptors.request.use(
   (config) => {
 
     const token = getAccessToken?.();
+    const isRefreshRequest =
+      config.url?.includes("/auth/refresh-token");
 
-    if (token) {
+    if (token && !isRefreshRequest) {
       config.headers.Authorization =
         `Bearer ${token}`;
     }
@@ -91,7 +93,8 @@ api.interceptors.response.use(
 
     // Don't refresh the refresh request
     if (
-      originalRequest.url?.includes("/auth/refresh")
+      originalRequest.url?.includes("/auth/refresh-token")
+      || originalRequest.url?.includes("/auth/login")
     ) {
       return Promise.reject(error);
     }
@@ -150,8 +153,8 @@ api.interceptors.response.use(
 
     try {
 
-      const response = await api.post(
-        "/auth/refresh"
+      const response = await api.get(
+        "/auth/refresh-token"
       );
 
 
@@ -172,7 +175,7 @@ api.interceptors.response.use(
         const {
           setAccessToken,
         } = await import(
-          "@/redux/auth/authSlice"
+          "../Redux/auth/authSlice"
         );
 
         dispatch(

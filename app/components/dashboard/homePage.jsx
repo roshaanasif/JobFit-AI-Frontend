@@ -1,33 +1,99 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSelector,useDispatch } from "react-redux";
+import {useEffect} from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlus,
+  faFileLines,
+  faChartLine,
+  faCircleCheck,
+  faTriangleExclamation,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
+import {recentUserReport, KpiUser} from "../../Redux/dashboard/dashboardThunk"
 
 export default function DashboardPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const recentAnalyses = [
-    {
-      id: 1,
-      title: "Backend Developer",
-      company: "ABC Technologies",
-      score: 86,
-      date: "Today",
-    },
-    {
-      id: 2,
-      title: "Full Stack Developer",
-      company: "Tech Solutions",
-      score: 74,
-      date: "Yesterday",
-    },
-    {
-      id: 3,
-      title: "Node.js Developer",
-      company: "Digital Labs",
-      score: 91,
-      date: "Oct 20, 2026",
-    },
-  ];
+  const {  user,
+    loading,
+  initialized,
+  initialLoading,
+  initialError,} = useSelector(
+    (state) => state.auth
+  );
+
+  const { dashboardLoading ,kpi, recentReports } = useSelector(
+    (state) => state.dashboard
+  );
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const getDashboardData = async () => {
+      try {
+        await dispatch(KpiUser()).unwrap();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const getrecentReportsData = async () => {
+      try {
+        await dispatch(recentUserReport({
+          id:user?._id,
+          recent:true
+        })).unwrap();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getDashboardData();
+    getrecentReportsData()
+
+  }, [user?._id, dispatch]);
+
+  if (!initialized || initialLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+const formatDate=(date)=> {
+  const inputDate = new Date(date);
+  const today = new Date();
+
+  inputDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const difference = today - inputDate;
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  if (difference === 0) {
+    return "Today";
+  }
+
+  if (difference === oneDay) {
+    return "Yesterday";
+  }
+
+  return inputDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -46,7 +112,7 @@ export default function DashboardPage() {
           <div>
 
             <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-[#111827]">
-              Welcome back, Roshaan 👋
+              {loading ? "loading... " : `Welcome back, ${user?.name}`} 👋
             </h1>
 
             <p className="mt-2 text-[#64748B] max-w-2xl">
@@ -72,7 +138,7 @@ export default function DashboardPage() {
               transition
             "
           >
-            <span className="text-lg">+</span>
+            <FontAwesomeIcon icon={faPlus} />
             New Analysis
           </button>
 
@@ -125,7 +191,8 @@ export default function DashboardPage() {
               transition
             "
           >
-            Analyze a Job →
+            Analyze a Job 
+             <FontAwesomeIcon icon={faArrowRight} />
           </button>
 
         </div>
@@ -140,32 +207,39 @@ export default function DashboardPage() {
 
         <StatCard
           label="Total Analyses"
-          value="12"
+          value={kpi?.stats?.totalAnalyses ?? 0}
           description="Jobs analyzed"
-          icon="▣"
+          icon={faFileLines}
+          loading={dashboardLoading}
         />
 
         <StatCard
           label="Average Match"
-          value="82%"
+          value={`${kpi?.stats?.averageMatch ?? 0}%`}
           description="Across all jobs"
-          icon="%"
+          icon={faChartLine}
           accent
+          loading={dashboardLoading}
+
         />
 
         <StatCard
           label="Strong Matches"
-          value="7"
+          value={kpi?.stats?.strongMatches ?? 0}
           description="Above 80%"
-          icon="✓"
+          icon={faCircleCheck}
+          loading={dashboardLoading}
+
         />
 
         <StatCard
           label="Skill Gaps"
-          value="18"
+          value={kpi?.stats?.skillGaps ?? 0}
           description="Skills to improve"
-          icon="!"
+          icon={faTriangleExclamation}
           warning
+          loading={dashboardLoading}
+
         />
 
       </section>
@@ -191,7 +265,8 @@ export default function DashboardPage() {
 
           </div>
 
-          <button
+       {recentReports?.reports?.length > 0 ?
+         ( <button
             onClick={() => router.push("/history")}
             className="
               text-sm
@@ -201,7 +276,7 @@ export default function DashboardPage() {
             "
           >
             View all →
-          </button>
+          </button>):""}
 
         </div>
 
@@ -209,7 +284,8 @@ export default function DashboardPage() {
         {/* Analysis List */}
         <div className="divide-y divide-slate-100">
 
-          {recentAnalyses.map((analysis) => (
+          {recentReports?.reports?.length > 0 ? (
+              recentReports?.reports?.map((analysis) => (
 
             <div
               key={analysis.id}
@@ -228,13 +304,13 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4">
 
                 <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#1D4ED8] flex items-center justify-center font-bold">
-                  {analysis.title.charAt(0)}
+                  {analysis.jobRole?.split("")?.[0]}
                 </div>
 
                 <div>
 
                   <h3 className="font-semibold text-[#111827]">
-                    {analysis.title}
+                    {analysis.jobRole}
                   </h3>
 
                   <p className="text-sm text-[#64748B] mt-1">
@@ -259,21 +335,22 @@ export default function DashboardPage() {
                     className={`
                       text-xl font-bold
                       ${
-                        analysis.score >= 80
+                        analysis.matchScore >= 80
                           ? "text-green-600"
-                          : analysis.score >= 60
+                          : analysis.matchScore >= 60
                           ? "text-[#F59E0B]"
                           : "text-red-500"
                       }
                     `}
                   >
-                    {analysis.score}%
+                    {analysis.matchScore}%
                   </p>
 
                 </div>
 
                 <div className="hidden sm:block text-xs text-[#64748B]">
-                  {analysis.date}
+                  {formatDate(analysis?.createdAt)}
+                  {/* {new Date(analysis.createdAt).toLocaleDateString()} */}
                 </div>
 
                 <button
@@ -299,9 +376,45 @@ export default function DashboardPage() {
 
             </div>
 
-          ))}
+         ))):(
+           <div className="py-12 px-6 text-center">
 
-        </div>
+      <div className="mx-auto w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center">
+        <FontAwesomeIcon icon={faFileLines} />
+      </div>
+
+      <h3 className="mt-4 text-sm font-semibold text-[#111827]">
+        No recent reports
+      </h3>
+
+      <p className="mt-1 text-sm text-[#64748B]">
+        Your latest job analysis reports will appear here.
+      </p>
+
+      <button
+        onClick={() => router.push("/analyze")}
+        className="
+          mt-5
+          inline-flex items-center gap-2
+          px-4 py-2
+          rounded-lg
+          bg-[#1D4ED8]
+          text-white
+          text-sm
+          font-semibold
+          hover:bg-[#1e40af]
+          transition
+        "
+      >
+        <FontAwesomeIcon icon={faPlus} />
+        Analyze a Job
+      </button>
+
+    </div>
+  )}
+
+
+       </div>
 
       </section>
 
@@ -314,6 +427,7 @@ export default function DashboardPage() {
    STAT CARD
 ========================= */
 
+
 function StatCard({
   label,
   value,
@@ -321,6 +435,7 @@ function StatCard({
   icon,
   accent,
   warning,
+  loading
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -328,19 +443,27 @@ function StatCard({
       <div className="flex items-start justify-between">
 
         <div>
-
+          {loading ? (
+            <div className="mt-2 h-3 w-28 bg-slate-200 rounded animate-pulse" />
+          ) : (
           <p className="text-sm text-[#64748B]">
             {label}
           </p>
+          )}
 
+          {loading ? (
+            <div className="mt-2 h-3 w-28 bg-slate-200 rounded animate-pulse" />
+          ) : (
           <p className="mt-2 text-3xl font-bold text-[#111827]">
             {value}
-          </p>
+          </p>)}
 
+          {loading ? (
+            <div className="mt-2 h-3 w-28 bg-slate-200 rounded animate-pulse" />
+          ) : (
           <p className="mt-1 text-xs text-[#64748B]">
             {description}
-          </p>
-
+          </p>)}
         </div>
 
         <div
@@ -348,7 +471,6 @@ function StatCard({
             w-10 h-10
             rounded-xl
             flex items-center justify-center
-            font-bold
 
             ${
               warning
@@ -359,7 +481,7 @@ function StatCard({
             }
           `}
         >
-          {icon}
+          <FontAwesomeIcon icon={icon} className="text-lg" />
         </div>
 
       </div>

@@ -55,5 +55,9 @@ export const checkAuth = createAsyncThunk(
         error.response?.data?.message || "Failed to fetch user details"
       );
     }
+  },
+  {
+    condition: (options, { getState }) =>
+      options?.force || !getState().auth.initialLoading,
   }
 );

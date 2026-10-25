@@ -17,11 +17,6 @@ const ProtectedRoute = ({ children }) => {
     }
   }, [isAuthenticated,initialized, router]);
 
-  // useEffect(() => {
-  //   if (initialized && isAuthenticated) {
-  //     router.replace("/home");
-  //   }
-  // }, [initialized, isAuthenticated, router]);
 
   if (!initialized || initialLoading) {
     return(

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 
-import { loginUser } from "../../Redux/auth/authThunk";
+import { checkAuth, loginUser } from "../../Redux/auth/authThunk";
 
 export default function Login() {
 
@@ -35,6 +35,8 @@ export default function Login() {
           password,
         })
       ).unwrap();
+
+      await dispatch(checkAuth({ force: true })).unwrap();
 
       setSuccessMessage(
         result.message || "Signed in successfully."
