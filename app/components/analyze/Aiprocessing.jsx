@@ -17,18 +17,19 @@ import {
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function AnalysisProcessingPage() {
+export default function AnalysisProcessing() {
   const router = useRouter();
 
 
- const { analyzeLoading  } = useSelector(
+  const { analyzeLoading } = useSelector(
     (state) => state.analyze
   );
 
-
-if (!analyzeLoading) {
-    router.push("/analyze")
-}
+  useEffect(() => {
+    if (!analyzeLoading) {
+      router.push("/analyze");
+    }
+  }, [analyzeLoading, router]);
 
 
 
@@ -562,7 +563,7 @@ if (!analyzeLoading) {
 
               <button
                 onClick={() =>
-                  router.push("/analysis/1")
+                  router.push("/dashboard")
                 }
                 className="
                   mt-6

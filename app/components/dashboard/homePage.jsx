@@ -265,7 +265,7 @@ const formatDate=(date)=> {
 
           </div>
 
-       {recentReports?.reports?.length > 0 ?
+       {recentReports?.length > 0 ?
          ( <button
             onClick={() => router.push("/history")}
             className="
@@ -284,8 +284,8 @@ const formatDate=(date)=> {
         {/* Analysis List */}
         <div className="divide-y divide-slate-100">
 
-          {recentReports?.reports?.length > 0 ? (
-              recentReports?.reports?.map((analysis) => (
+          {recentReports?.length > 0 ? (
+              recentReports?.map((analysis) => (
 
             <div
               key={analysis.id}

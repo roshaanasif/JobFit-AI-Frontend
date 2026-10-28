@@ -49,7 +49,7 @@ const dashboardSlice = createSlice({
       .addCase(recentUserReport.fulfilled, (state, action) => {
         state.dashboardLoading = false;
         state.error = null;
-        state.recentReports = action.payload;
+        state.recentReports = action.payload.reports;
       })
 
       .addCase(recentUserReport.rejected, (state, action) => {
