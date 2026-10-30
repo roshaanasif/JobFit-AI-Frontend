@@ -13,6 +13,7 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import {recentUserReport, KpiUser} from "../../Redux/dashboard/dashboardThunk"
+import { formatDate ,slugify } from "../../utils/all";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -69,30 +70,12 @@ export default function DashboardPage() {
     return null;
   }
 
-const formatDate=(date)=> {
-  const inputDate = new Date(date);
-  const today = new Date();
 
-  inputDate.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  
 
-  const difference = today - inputDate;
-  const oneDay = 24 * 60 * 60 * 1000;
 
-  if (difference === 0) {
-    return "Today";
-  }
 
-  if (difference === oneDay) {
-    return "Yesterday";
-  }
 
-  return inputDate.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 
   return (
@@ -288,7 +271,10 @@ const formatDate=(date)=> {
               recentReports?.map((analysis) => (
 
             <div
-              key={analysis.id}
+              key={analysis._id}
+               onClick={() =>
+                    router.push(`/analysis/${slugify(analysis.jobRole)}/${analysis._id}?from=dashboard`)
+                  }
               className="
                 p-5 sm:p-6
                 flex flex-col md:flex-row
@@ -350,12 +336,11 @@ const formatDate=(date)=> {
 
                 <div className="hidden sm:block text-xs text-[#64748B]">
                   {formatDate(analysis?.createdAt)}
-                  {/* {new Date(analysis.createdAt).toLocaleDateString()} */}
                 </div>
 
                 <button
                   onClick={() =>
-                    router.push(`/analysis/${analysis.id}`)
+                    router.push(`/analysis/${slugify(analysis.jobRole)}/${analysis._id}?from=dashboard`)
                   }
                   className="
                     px-4 py-2

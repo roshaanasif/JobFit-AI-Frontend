@@ -1,6 +1,6 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {generatingAiResponseApi } from "./analyzeServices";
+import {generatingAiResponseApi,singleReportApi } from "./analyzeServices";
 
 export const generatingAiResponse = createAsyncThunk(
   "analyze/report generation",
@@ -11,6 +11,19 @@ export const generatingAiResponse = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "report generation failed"
+      );
+    }
+  }
+);
+
+export const singleReport = createAsyncThunk(
+  "analyze/single report",
+  async ({ id }, thunkAPI) => {
+    try {
+       return await singleReportApi({ id });
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "report fetching failed"
       );
     }
   }

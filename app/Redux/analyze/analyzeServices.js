@@ -6,18 +6,9 @@ export const generatingAiResponseApi = async (formData) => {
 };
 
 
-// export const registerUserApi = async ({ name, email, password }) => {
-//   const response = await api.post("/auth/register", { name, email, password });
-//   return response.data;
-// };
+export const singleReportApi = async ({ id }) => {
+  const response = await api.get(`/report/${id}`);
+  return response.data;
+};
 
 
-// export const logoutUserApi = async () => {
-//   const response = await api.post("/auth/logout");
-//   return response.data;
-// };
-
-// export const getmeApi = async () => {
-//   const response = await api.get("/auth/get-me");
-//   return response.data;
-// };

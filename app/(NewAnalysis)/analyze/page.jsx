@@ -2,7 +2,7 @@
 
 import { useRef, useState ,useEffect} from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch  } from "react-redux";
+import { useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {generatingAiResponse} from "../../Redux/analyze/analyzeThunk"
 import AnalysisProcessing from "../../components/analyze/Aiprocessing";
@@ -18,6 +18,9 @@ import {
   faCircleInfo,
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
+import { slugify } from "../../utils/all";
+import { report } from "process";
+
 
 export default function NewAnalysisPage() {
   const router = useRouter();
@@ -212,15 +215,27 @@ export default function NewAnalysisPage() {
         SEND TO REDUX
     ========================= */
 
-    await dispatch(
+    const Response = await dispatch(
       generatingAiResponse(formData)
     ).unwrap();
 
-    /* =========================
-        SUCCESS
-    ========================= */
 
-    router.push("/analyze/processing");
+    const reportResponse=Response?.report
+    
+    const reportId = reportResponse?._id ?? reportResponse?.id;
+ 
+    const jobRole = reportResponse?.jobRole;
+      
+
+    const slug = typeof jobRole === "string" ? slugify(jobRole) : "";
+
+    if (!reportId || !slug) {
+      throw new Error("The generated report is missing its role or ID.");
+    }
+
+    router.replace(
+      `/analysis/${encodeURIComponent(slug)}/${encodeURIComponent(String(reportId))}`
+    );
 
   } catch (error) {
     console.error(
@@ -235,14 +250,12 @@ export default function NewAnalysisPage() {
           "Something went wrong while analyzing your job fit.";
 
     setError(errorMessage);
+    setIsSubmitting(false);
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
-
-  } finally {
-    setIsSubmitting(false);
   }
 };
   
