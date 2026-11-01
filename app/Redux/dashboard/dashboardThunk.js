@@ -18,9 +18,9 @@ export const KpiUser = createAsyncThunk(
 
 export const recentUserReport  = createAsyncThunk(
   "dashboard/recentUserReport",
-  async ({id ,recent}, thunkAPI) => {
+  async ({id ,recent,page,limit}, thunkAPI) => {
     try {
-      return await recentUserReportApi({ id, recent });
+      return await recentUserReportApi({ id, recent ,page ,limit });
 
     } catch (error) {
       return thunkAPI.rejectWithValue(

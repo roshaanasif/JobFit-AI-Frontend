@@ -7,6 +7,14 @@ const initialState = {
   recentReports:[],
   dashboardLoading: false,
   error: null,
+  pagination:{
+    currentPage:1,
+    pageLimit:10,
+    totalPages:0,
+    totalReports:0,
+    hasNextPage:false,
+    hasPrevPage:false,
+  },
 };
 
 const dashboardSlice = createSlice({
@@ -50,11 +58,13 @@ const dashboardSlice = createSlice({
         state.dashboardLoading = false;
         state.error = null;
         state.recentReports = action.payload.reports;
+        state.pagination = action.payload.pagination;
       })
 
       .addCase(recentUserReport.rejected, (state, action) => {
         state.dashboardLoading = false;
         state.error = action.payload;
+        state.pagination = { ...initialState.pagination };
       })
     }
 });

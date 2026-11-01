@@ -46,7 +46,7 @@ export default function DashboardPage() {
       try {
         await dispatch(recentUserReport({
           id:user?._id,
-          recent:true
+          recent:true,
         })).unwrap();
       } catch (error) {
         console.log(error);

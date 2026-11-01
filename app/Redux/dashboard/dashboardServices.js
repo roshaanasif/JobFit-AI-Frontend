@@ -6,8 +6,8 @@ export const KpiUserApi = async () => {
 };
 
 
-export const recentUserReportApi = async ({ id, recent }) => {
-  const response = await api.get(`/report/report-history/${id}`,{params: {recent}});
+export const recentUserReportApi = async ({ id, recent ,page ,limit }) => {
+  const response = await api.get(`/report/report-history/${id}`,{params: {recent,page ,limit}});
   return response.data;
 };
 
