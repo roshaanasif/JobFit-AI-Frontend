@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import {loginUser,registerUser,checkAuth,logoutUser} from "./authThunk";
+import {updateProfile,addProfilePicture,deleteProfilePicture} from "../profile/profileThunk";
 
 const initialState = {
   user: null,
@@ -12,6 +13,9 @@ const initialState = {
   loading: false,
   error: null,
 };
+
+const getUpdatedProfile = (payload) =>
+  payload?.user || payload?.updatedProfile || payload;
 
 const authSlice = createSlice({
   name: "auth",
@@ -108,6 +112,15 @@ const authSlice = createSlice({
         state.initialLoading = false;
         state.initialError = action.payload;
         state.initialized=true
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = getUpdatedProfile(action.payload);
+      })
+      .addCase(addProfilePicture.fulfilled, (state, action) => {
+        state.user = getUpdatedProfile(action.payload);
+      })
+      .addCase(deleteProfilePicture.fulfilled, (state, action) => {
+        state.user = getUpdatedProfile(action.payload);
       });
   },
 });
