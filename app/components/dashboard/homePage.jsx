@@ -31,6 +31,12 @@ export default function DashboardPage() {
     (state) => state.dashboard
   );
 
+  const totalAnalyses = kpi?.stats?.totalAnalyses ?? 0;
+
+const isNewUser =
+  !dashboardLoading &&
+  kpi?.stats?.totalAnalyses === 0;
+  
   useEffect(() => {
     if (!user?._id) return;
 
@@ -95,13 +101,19 @@ export default function DashboardPage() {
           <div>
 
             <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-[#111827]">
-              {loading ? "loading... " : `Welcome back, ${user?.name}`} 👋
-            </h1>
+            {loading
+              ? "Loading..."
+              : isNewUser
+              ? `Welcome to Job Fit AI, ${user?.name}!`
+              : `Welcome back, ${user?.name}`} 👋
+          </h1>
 
-            <p className="mt-2 text-[#64748B] max-w-2xl">
-              Analyze how well your resume matches your next job and discover
-              the skills you need to improve.
-            </p>
+          <p className="mt-2 text-[#64748B] max-w-2xl">
+            {isNewUser
+              ? "Your career preparation starts here. Create your first job analysis to discover how well your resume matches your dream job."
+              : "Analyze how well your resume matches your next job and discover the skills you need to improve."}
+          </p>
+
 
           </div>
 
@@ -142,44 +154,32 @@ export default function DashboardPage() {
 
         <div className="relative z-10 max-w-2xl">
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm mb-5">
+  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm mb-5">
+    <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
+    {isNewUser ? "GETTING STARTED" : "AI JOB ANALYSIS"}
+  </div>
 
-            <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
+  <h2 className="text-2xl sm:text-3xl font-bold">
+    {isNewUser
+      ? "Let's find your perfect job match."
+      : "Find out if you're ready for your next job."}
+  </h2>
 
-            AI Job Analysis
+  <p className="mt-3 text-blue-100 leading-7">
+    {isNewUser
+      ? "Upload your resume and provide a job description. Our AI will evaluate your skills, calculate your match score, identify skill gaps, and build a personalized preparation plan."
+      : "Upload your resume and add the job description. Our AI will calculate your match score, identify skill gaps, create a preparation plan, and generate technical interview questions."}
+  </p>
 
-          </div>
+  <button
+    onClick={() => router.push("/analyze")}
+    className="mt-6 px-5 py-3 rounded-xl bg-white text-[#1D4ED8] font-semibold text-sm hover:bg-blue-50 transition"
+  >
+    {isNewUser ? "Create Your First Analysis" : "Analyze a Job"}
+    <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+  </button>
 
-          <h2 className="text-2xl sm:text-3xl font-bold">
-            Find out if you're ready for your next job.
-          </h2>
-
-          <p className="mt-3 text-blue-100 leading-7">
-            Upload your resume and add the job description. Our AI will
-            calculate your match score, identify skill gaps, create a
-            preparation plan, and generate technical interview questions.
-          </p>
-
-          <button
-            onClick={() => router.push("/analyze")}
-            className="
-              mt-6
-              px-5 py-3
-              rounded-xl
-              bg-white
-              text-[#1D4ED8]
-              font-semibold
-              text-sm
-              hover:bg-blue-50
-              transition
-            "
-          >
-            Analyze a Job 
-             <FontAwesomeIcon icon={faArrowRight} />
-          </button>
-
-        </div>
-
+</div>
       </section>
 
 
@@ -277,6 +277,7 @@ export default function DashboardPage() {
                   }
               className="
                 p-5 sm:p-6
+                cursor-pointer
                 flex flex-col md:flex-row
                 md:items-center
                 justify-between

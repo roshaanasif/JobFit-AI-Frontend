@@ -387,7 +387,7 @@ export default function DashboardLayout({ children }) {
 
 
             {/* Avatar */}
-           {!loading && (
+           {/* {!loading && ( */}
           <div
             className="
               w-10 h-10
@@ -399,9 +399,9 @@ export default function DashboardLayout({ children }) {
               font-semibold
             "
           >
-            {user?.name?.split("")?.[0]}
+            {user?.name?.split("")?.[0]?.toUpperCase()}
           </div>
-        )}
+        {/* )} */}
 
           </div>
 

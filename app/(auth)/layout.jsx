@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-export default function page({children}) {
-  const router=useRouter()
-  const [isLogin, setIsLogin] = useState(true);
-
+export default function AuthLayout({ children }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const isLogin = pathname !== "/register";
 
   return (
     <main className="min-h-full bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6">
@@ -27,17 +26,17 @@ export default function page({children}) {
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center">
                 <span className="text-[#1D4ED8] font-bold text-xl">
-                  RB
+                  JF
                 </span>
               </div>
 
               <div>
                 <h1 className="font-bold text-xl tracking-tight">
-                 Resmue builder
+                  Job Fit AI
                 </h1>
 
                 <p className="text-xs text-blue-100">
-                  Secure authentication
+                  Your AI-Powered Career Assistant
                 </p>
               </div>
             </div>
@@ -47,32 +46,34 @@ export default function page({children}) {
           <div className="relative z-10 my-12 lg:my-0">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm mb-6">
               <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-              Secure & Reliable
+              AI-Powered Career Analysis
             </div>
 
             <h2 className="text-4xl sm:text-5xl font-bold leading-tight max-w-lg">
               {isLogin
-                ? "Welcome back to your account."
-                : "Create your account today."}
+                ? "Welcome back to your career journey."
+                : "Take the next step toward your dream job."}
             </h2>
 
             <p className="mt-6 text-blue-100 text-base sm:text-lg leading-7 max-w-md">
               {isLogin
-                ? "Sign in to continue managing your account and access all your personalized features."
-                : "Join us and start managing your account with a simple, secure and modern experience."}
+                ? "Sign in to analyze job opportunities, track your skill gaps, and continue preparing for your next career move."
+                : "Create your account to discover your job match score, identify missing skills, and get a personalized interview preparation plan."}
             </p>
           </div>
 
           {/* Bottom */}
           <div className="relative z-10 flex items-center gap-2 text-sm text-blue-100">
             <span>●</span>
-            <span>Secure authentication</span>
+            <span>AI-Powered Insights</span>
             <span>•</span>
-            <span>Protected data</span>
+            <span>Career Growth</span>
           </div>
         </section>
 
-       
+        {/* =========================
+            RIGHT SIDE - AUTH FORM
+        ========================= */}
         <section className="lg:w-1/2 p-6 sm:p-10 lg:p-16 flex items-center justify-center">
 
           <div className="w-full max-w-md">
@@ -84,33 +85,27 @@ export default function page({children}) {
               </p>
 
               <h2 className="text-3xl sm:text-4xl font-bold text-[#111827]">
-                {isLogin ? "Sign in" : "Create account"}
+                {isLogin ? "Sign in to Job Fit AI" : "Create your account"}
               </h2>
 
               <p className="mt-2 text-[#64748B]">
                 {isLogin
-                  ? "Enter your credentials to access your account."
-                  : "Fill in your details to create your new account."}
+                  ? "Enter your credentials to continue your career preparation."
+                  : "Join Job Fit AI and discover how well your skills match your dream job."}
               </p>
             </div>
 
-           {
-            children
-           }
-
+            {children}
 
             {/* Switch Login/Register */}
             <div className="mt-7 text-center text-sm text-[#64748B]">
 
               {isLogin ? (
                 <>
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsLogin(false);
-                      router.push("/register");
-                    }}
+                    onClick={() => router.push("/register")}
                     className="font-semibold text-[#1D4ED8] hover:text-[#1e40af] transition-colors"
                   >
                     Create an account
@@ -121,10 +116,7 @@ export default function page({children}) {
                   Already have an account?{" "}
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsLogin(true);
-                      router.push("/login");
-                    }}
+                    onClick={() => router.push("/login")}
                     className="font-semibold text-[#1D4ED8] hover:text-[#1e40af] transition-colors"
                   >
                     Sign in

@@ -20,6 +20,13 @@ const analyzeSlice = createSlice({
     clearError: (state) => {
       state.analyzeError = null;
     },
+
+     resetAnalyzeState: (state) => {
+      state.analyzeLoading = false;
+      state.analyzeSuccess = false;
+      state.analyzeError = null;
+      state.generatedReport = [];
+    },
   },
 
 
@@ -63,6 +70,7 @@ const analyzeSlice = createSlice({
 
 export const {
   clearError,
+  resetAnalyzeState,
 } = analyzeSlice.actions;
 
 export default analyzeSlice.reducer;

@@ -10,7 +10,6 @@ import {
   faBullseye,
   faCalendarDays,
   faCircleCheck,
-  faClock,
   faCode,
   faChevronDown,
   faChevronUp,

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {generatingAiResponse} from "../../Redux/analyze/analyzeThunk"
+import {resetAnalyzeState} from "../../Redux/analyze/analyzeSlice"
 import AnalysisProcessing from "../../components/analyze/Aiprocessing";
 import ProtectedRoute from "../../components/protectedRoutes"
 import {
@@ -19,7 +20,6 @@ import {
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { slugify } from "../../utils/all";
-import { report } from "process";
 
 
 export default function NewAnalysisPage() {
@@ -214,6 +214,8 @@ export default function NewAnalysisPage() {
     /* =========================
         SEND TO REDUX
     ========================= */
+
+    dispatch(resetAnalyzeState());
 
     const Response = await dispatch(
       generatingAiResponse(formData)
@@ -1144,7 +1146,7 @@ return (
       </div>
     ) : (
 
-      <AnalysisProcessing />
+      <AnalysisProcessing submit={setIsSubmitting}/>
 
     )}
 

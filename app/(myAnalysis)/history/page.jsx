@@ -73,7 +73,7 @@ useEffect(() => {
     if (!user?._id) return ;
 
     const timeoutId = setTimeout(() => {
-      dispatch(searchOnHistory({ search, filter, page, limit: 4 }));
+      dispatch(searchOnHistory({ search, filter, page, limit: 8 }));
     }, 250);
 
     return () => clearTimeout(timeoutId);
