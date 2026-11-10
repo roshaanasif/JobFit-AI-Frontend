@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch,useSelector } from "react-redux";
 import {  useRouter } from "next/navigation";
+import ProtectedRoute  from "../../components/protectedRoutes"
 
 import {
   faUser,
@@ -240,6 +241,8 @@ const handleDeleteImage = async () => {
   }, [previewImage]);
 
   return (
+
+    <ProtectedRoute>
     <div className="min-h-screen bg-[#F8FAFC] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
 
@@ -585,5 +588,6 @@ const handleDeleteImage = async () => {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

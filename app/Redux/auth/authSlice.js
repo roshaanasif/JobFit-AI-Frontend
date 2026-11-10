@@ -17,6 +17,15 @@ const initialState = {
 const getUpdatedProfile = (payload) =>
   payload?.user || payload?.updatedProfile || payload;
 
+const normalizeUser = (user) =>
+  user
+    ? {
+        ...user,
+        _id: user._id || user.id,
+        name: user.name || user.username,
+      }
+    : user;
+
 const authSlice = createSlice({
   name: "auth",
 
@@ -52,7 +61,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.accessToken = action.payload.token;
-        state.user = action.payload.user;
+        state.user = normalizeUser(action.payload.user);
         state.isAuthenticated = true;
       })
 
@@ -71,7 +80,7 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.user = action.payload.user;
+        state.user = normalizeUser(action.payload.user);
         state.isAuthenticated = true;
       })
 
@@ -102,7 +111,7 @@ const authSlice = createSlice({
 
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.initialError = null;
-        state.user = action.payload.user;
+        state.user = normalizeUser(action.payload.user);
         state.isAuthenticated = true;
         state.initialized = true;
         state.initialLoading = false;
@@ -114,13 +123,13 @@ const authSlice = createSlice({
         state.initialized=true
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
-        state.user = getUpdatedProfile(action.payload);
+        state.user = normalizeUser(getUpdatedProfile(action.payload));
       })
       .addCase(addProfilePicture.fulfilled, (state, action) => {
-        state.user = getUpdatedProfile(action.payload);
+        state.user = normalizeUser(getUpdatedProfile(action.payload));
       })
       .addCase(deleteProfilePicture.fulfilled, (state, action) => {
-        state.user = getUpdatedProfile(action.payload);
+        state.user = normalizeUser(getUpdatedProfile(action.payload));
       });
   },
 });
