@@ -4,220 +4,116 @@ const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
     "http://localhost:5000/api",
-
   withCredentials: true,
 });
 
 let getAccessToken = null;
 let dispatch = null;
 
-export const setupAxios = ({
-  getToken,
-  reduxDispatch,
-}) => {
+export const setupAxios = ({ getToken, reduxDispatch }) => {
   getAccessToken = getToken;
   dispatch = reduxDispatch;
 };
 
-
-// ---------------------------------------------
-// REQUEST INTERCEPTOR
-// ---------------------------------------------
-
 api.interceptors.request.use(
   (config) => {
-
     const token = getAccessToken?.();
-    const isRefreshRequest =
-      config.url?.includes("/auth/refresh-token");
+    const isRefreshRequest = config.url?.includes("/auth/refresh-token");
 
     if (token && !isRefreshRequest) {
-      config.headers.Authorization =
-        `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-
-// ---------------------------------------------
-// REFRESH CONTROL
-// ---------------------------------------------
-
 let isRefreshing = false;
-
 let failedQueue = [];
 
-
 const processQueue = (error, token = null) => {
-
-  failedQueue.forEach((promise) => {
-
+  failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
-      promise.reject(error);
+      reject(error);
     } else {
-      promise.resolve(token);
+      resolve(token);
     }
-
   });
 
   failedQueue = [];
 };
 
+const clearAuth = async () => {
+  if (!dispatch) {
+    return;
+  }
 
-// ---------------------------------------------
-// RESPONSE INTERCEPTOR
-// ---------------------------------------------
+  const { logout } = await import("../Redux/auth/authSlice");
+  dispatch(logout());
+};
 
 api.interceptors.response.use(
-
   (response) => response,
-
   async (error) => {
-
     const originalRequest = error.config;
+    const requestUrl = originalRequest?.url || "";
 
-    // Only handle 401
+    if (error.response?.status !== 401 || !originalRequest) {
+      return Promise.reject(error);
+    }
+
     if (
-      error.response?.status !== 401 ||
-      !originalRequest
+      requestUrl.includes("/auth/refresh-token") ||
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register")
     ) {
       return Promise.reject(error);
     }
 
-
-    // Don't refresh the refresh request
-    if (
-      originalRequest.url?.includes("/auth/refresh-token")
-      || originalRequest.url?.includes("/auth/login")
-    ) {
-      return Promise.reject(error);
-    }
-
-
-    // Prevent infinite retry
     if (originalRequest._retry) {
-
-      if (dispatch) {
-        // We'll handle logout here later
-      }
-
+      await clearAuth();
       return Promise.reject(error);
     }
-
 
     originalRequest._retry = true;
 
-
-    // ---------------------------------------------
-    // Another request is already refreshing
-    // ---------------------------------------------
-
     if (isRefreshing) {
-
       return new Promise((resolve, reject) => {
-
-        failedQueue.push({
-          resolve,
-          reject,
-        });
-
-      })
-        .then((newToken) => {
-
-          originalRequest.headers.Authorization =
-            `Bearer ${newToken}`;
-
-          return api(originalRequest);
-
-        })
-        .catch((err) => {
-
-          return Promise.reject(err);
-
-        });
+        failedQueue.push({ resolve, reject });
+      }).then((newToken) => {
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      });
     }
-
-
-    // ---------------------------------------------
-    // Start refresh
-    // ---------------------------------------------
 
     isRefreshing = true;
 
-
     try {
-
-      const response = await api.get(
-        "/auth/refresh-token"
-      );
-
-
-      const newAccessToken =
-        response.data.token;
-
+      const response = await api.get("/auth/refresh-token");
+      const newAccessToken = response.data?.token;
 
       if (!newAccessToken) {
-        throw new Error(
-          "No access token returned from refresh endpoint"
-        );
+        throw new Error("Refresh endpoint did not return an access token");
       }
 
-
-      // Tell Redux about new token
       if (dispatch) {
-
-        const {
-          setAccessToken,
-        } = await import(
-          "../Redux/auth/authSlice"
-        );
-
-        dispatch(
-          setAccessToken(newAccessToken)
-        );
+        const { setAccessToken } = await import("../Redux/auth/authSlice");
+        dispatch(setAccessToken(newAccessToken));
       }
 
+      processQueue(null, newAccessToken);
 
-      // Resolve waiting requests
-      processQueue(
-        null,
-        newAccessToken
-      );
-
-
-      // Retry original request
-      originalRequest.headers.Authorization =
-        `Bearer ${newAccessToken}`;
-
-
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return api(originalRequest);
-
-
     } catch (refreshError) {
-
-      processQueue(
-        refreshError,
-        null
-      );
-
-
-      return Promise.reject(
-        refreshError
-      );
-
+      processQueue(refreshError);
+      await clearAuth();
+      return Promise.reject(refreshError);
     } finally {
-
       isRefreshing = false;
-
     }
   }
 );
-
 
 export default api;
