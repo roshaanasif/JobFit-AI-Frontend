@@ -1,4 +1,6 @@
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBriefcase } from "@fortawesome/free-solid-svg-icons";
 export default function AuthLoadingScreen() {
   return (
     <div
@@ -15,15 +17,14 @@ export default function AuthLoadingScreen() {
       <div className="relative w-full max-w-sm rounded-3xl border border-slate-100 bg-white/90 px-8 py-10 text-center shadow-[0_20px_70px_-25px_rgba(29,78,216,0.18)] backdrop-blur-xl">
 
         {/* Logo */}
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6] shadow-lg shadow-blue-200/70">
-          <span className="text-xl font-bold tracking-tight text-white">
-            JF
-          </span>
-        </div>
+        
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D4ED8] text-white">
+                  <FontAwesomeIcon icon={faBriefcase} />
+            </div>
 
         {/* Brand */}
         <h1 className="mt-5 text-lg font-bold tracking-tight text-[#111827]">
-          Job Fit AI
+          Job Fit <span className="text-[#1D4ED8]">AI</span>
         </h1>
 
         <p className="mt-2 text-xl font-semibold tracking-tight text-[#111827]">

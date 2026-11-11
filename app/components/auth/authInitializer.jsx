@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "../../Redux/auth/authThunk";
 import AuthLoadingScreen from "./authLoadingScreen";
 
-export default function AuthInitializer() {
+export default function AuthInitializer({ children }) {
   const dispatch = useDispatch();
   const { initialized, initialLoading } = useSelector((state) => state.auth);
 
@@ -13,5 +13,9 @@ export default function AuthInitializer() {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  return !initialized || initialLoading ? <AuthLoadingScreen /> : null;
+  if (!initialized || initialLoading) {
+    return <AuthLoadingScreen />;
+  }
+
+  return children;
 }

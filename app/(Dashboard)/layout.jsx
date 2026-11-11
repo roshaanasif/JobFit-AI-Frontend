@@ -13,6 +13,7 @@ import {
   faArrowRightFromBracket,
   faBars,
   faBell,
+  faBriefcase,
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { logoutUser  } from "../Redux/auth/authThunk";
@@ -104,12 +105,8 @@ export default function DashboardLayout({ children }) {
 
           <div className="flex items-center gap-3">
 
-            <div className="w-11 h-11 rounded-xl bg-[#1D4ED8] flex items-center justify-center shadow-sm">
-
-              <span className="text-white font-bold text-sm">
-                JF
-              </span>
-
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D4ED8] text-white">
+                  <FontAwesomeIcon icon={faBriefcase} />
             </div>
 
             <div>
